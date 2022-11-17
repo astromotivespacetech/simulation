@@ -18,4 +18,4 @@ G_const = 6.67259e-11
 atm_1 = 101325
 
 # Earth radius at poles [m]
-EARTH_RAD = 6356752
+EARTH_RADIUS = 6356752

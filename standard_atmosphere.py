@@ -106,8 +106,8 @@ class Atmosphere(object):
             Returns:
                 geopotential height [km].
         '''
-        
-        return EARTH_RAD * 0.001 * altitude_km / (EARTH_RAD * 0.001 + altitude_km)
+
+        return EARTH_RADIUS * 0.001 * altitude_km / (EARTH_RADIUS * 0.001 + altitude_km)
 
 
 
