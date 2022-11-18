@@ -2,14 +2,14 @@ import math
 from conversions    import *
 from functions      import normalize
 from vector         import Vector
-from constants      import g_earth, EARTH_RAD
+from constants      import g_earth, EARTH_RADIUS
 
 
 
 class Atmosphere(object):
 
-
-    def calc_rho(self, alt):
+    @classmethod
+    def calc_rho(cls, alt):
         ''' Calculates atmospheric density.
             Arguments:
                 alt: altitude [km].
@@ -18,15 +18,15 @@ class Atmosphere(object):
          '''
 
         a             = alt / 1000                                              # convert to [ km ]
-        geopot_height = self.get_geopotential(a)                                # [ km ]
-        temp          = self.get_standard_temperature(geopot_height)            # [ Kelvin ]
-        standard_p    = self.get_standard_pressure(geopot_height, temp)         # [ Pascals ]
+        geopot_height = cls.get_geopotential(a)                                # [ km ]
+        temp          = cls.get_standard_temperature(geopot_height)            # [ Kelvin ]
+        standard_p    = cls.get_standard_pressure(geopot_height, temp)         # [ Pascals ]
         R             = 287.5                                                   # specific gas constant for dry air
 
         return standard_p / (R * temp) if standard_p > 0 else 0.0
 
-
-    def calc_ambient_pressure(self, alt):
+    @classmethod
+    def calc_ambient_pressure(cls, alt):
         ''' Setup function for get_standard_pressure.
             Arguments:
                 altitude [km]
@@ -35,15 +35,15 @@ class Atmosphere(object):
         '''
 
         a             = alt / 1000                                              # convert to [ km ]
-        geopot_height = self.get_geopotential(a)                                # [ km ]
-        temp          = self.get_standard_temperature(geopot_height)            # [ Kelvin ]
-        standard_p    = self.get_standard_pressure(geopot_height, temp)         # [ Pascals ]
+        geopot_height = cls.get_geopotential(a)                                # [ km ]
+        temp          = cls.get_standard_temperature(geopot_height)            # [ Kelvin ]
+        standard_p    = cls.get_standard_pressure(geopot_height, temp)         # [ Pascals ]
 
         return standard_p if standard_p > 0 else 0.0
 
 
-
-    def get_standard_pressure(self, geo, t):                                      # returns atmospheric pressure in Pascals
+    @classmethod
+    def get_standard_pressure(cls, geo, t):                                      # returns atmospheric pressure in Pascals
         ''' Calculates standard atmosphere pressure up to 84.85 km.
             Arguments:
                 g: geopotential height [km].
@@ -71,8 +71,8 @@ class Atmosphere(object):
             return 0
 
 
-
-    def get_standard_temperature(self, geo):
+    @classmethod
+    def get_standard_temperature(cls, geo):
         ''' Calculates standard temperature.
             Arguments:
                 g: geopotential [km].
@@ -99,7 +99,8 @@ class Atmosphere(object):
 
 
 
-    def get_geopotential(self, altitude_km):
+    @classmethod
+    def get_geopotential(cls, altitude_km):
         ''' Calculates geopotential height.
             Arguments:
                 altitude_km: altitude [km].
@@ -112,7 +113,8 @@ class Atmosphere(object):
 
 
 
-    def speed_of_sound(self, alt):
+    @classmethod
+    def speed_of_sound(cls, alt):
         ''' Calculates the speed of sound at a given altitude.
             Arguments:
                 alt: altitude [m].
@@ -121,8 +123,8 @@ class Atmosphere(object):
         '''
 
         a_km          = alt / 1000
-        geopot_height = self.get_geopotential(a_km)
-        temperature_k = self.get_standard_temperature(geopot_height)
+        geopot_height = cls.get_geopotential(a_km)
+        temperature_k = cls.get_standard_temperature(geopot_height)
         C             = kelvin2celcius(temperature_k)
 
         return 331.5 + 0.60 * C
@@ -135,8 +137,7 @@ class Atmosphere(object):
 
 if __name__ == "__main__":
 
-    a = Atmosphere()
 
     for x in range(100):
 
-        print( a.calc_rho(x*1000) )
+        print( Atmosphere.calc_rho(x*1000) )
