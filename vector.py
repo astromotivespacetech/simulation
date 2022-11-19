@@ -69,7 +69,7 @@ class Vector(object):
 
 
     def copy(self):
-        return Vector(list(self.data))
+        return Vector(self.data)
 
 
     def magnitude(self):
@@ -87,7 +87,7 @@ class Vector(object):
 
     def inverse(self):
         new = [-1 * x for x in self.data]
-        return Vector(new)
+        self.__init__(new)
 
 
     def angle(self, vector):
@@ -112,7 +112,7 @@ class Vector(object):
         v3 = v3.mult(1 - math.cos(angle))
         vrot.add(v2)
         vrot.add(v3)
-        return vrot
+        self.__init__(vrot.data)
 
 
 

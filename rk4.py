@@ -20,7 +20,7 @@ class State(object):
 class StateVector(object):
 
     def __init__(self, position, velocity):
-        self.vector = [State(p, v) for p, v in zip(position.points, velocity.points)]
+        self.vector = [State(p, v) for p, v in zip(position.data, velocity.data)]
 
 
 
@@ -82,7 +82,7 @@ if __name__=="__main__":
         #
         # could implement a function to vary acceleration here
         #
-        for s, a in zip(state.vector, acceleration.points):
+        for s, a in zip(state.vector, acceleration.data):
             rk4(s, a, timestep)
 
 
