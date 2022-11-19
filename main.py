@@ -30,6 +30,7 @@ if __name__=="__main__":
     time = [elapsed]
     altitude = [projectile.vector[2].p]
 
+
     # numerical integration loop
     for x in range( int(duration/dt) ):
 
@@ -63,11 +64,14 @@ if __name__=="__main__":
 
         for s, a in zip(projectile.vector, acceleration.data):
             rk4(s, a, dt)
-            elapsed += dt
-            time.append(elapsed)
-            pv = projectile.vector
-            altitude.append(pv[2].p)
-            velocity.update([pv[0].v, pv[1].v, pv[2].v])
+
+        elapsed += dt
+        time.append(elapsed)
+        pv = projectile.vector
+        altitude.append(pv[2].p)
+        velocity.update([pv[0].v, pv[1].v, pv[2].v])
+
+
 
     plt.plot(time, altitude)
     plt.show()
