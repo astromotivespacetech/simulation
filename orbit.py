@@ -9,6 +9,8 @@ from vector     import Vector
 
 def keplerian_elements(p, v):
 
+    ''' Converts orbital state vector to Keplerian elements. Returns apogee and perigee. '''
+
     GM = G_const * Earth.mass
     h = p.cross(v)
     e = v.cross(h)
@@ -54,7 +56,6 @@ class Orbit(object):
             self.velocity = Orbit.calc_velocity(sMajAxis, self.altitude)
 
 
-
     @classmethod
     def calc_semi_major_axis(self, apogee, perigee):
         ''' Calculates the semi-major axis given an apogee and perigee. '''
@@ -62,22 +63,11 @@ class Orbit(object):
         return 0.5 * (perigee + apogee)
 
 
-
     @classmethod
     def calc_velocity(self, sMajAxis, altitude):
         ''' Calculates the velocity at altitude in an elliptical orbit with a given semi-major axis. '''
 
         return sqrt( (G_const * Earth.mass) * (2.0 / altitude - 1/sMajAxis) )
-
-
-
-
-    # def calc_velocity_circular(self, altitude):
-    #     ''' Calculates the circular orbital velocity at a given apogee. '''
-    #
-    #     return sqrt( (G_const * Earth.mass) / (Earth.radius_equator + altitude) )
-
-
 
 
 
