@@ -65,7 +65,7 @@ class Vector(object):
         x = self.y * vector.z - self.z * vector.y
         y = self.z * vector.x - self.x * vector.z
         z = self.x * vector.y - self.y * vector.x
-        return Vector([x,y,z])
+        return Vector(x,y,z)
 
 
     def copy(self):
