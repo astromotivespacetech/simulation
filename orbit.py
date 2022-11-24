@@ -41,7 +41,7 @@ class Orbit(object):
 
     def __init__(self, perigee, apogee):
 
-        self.semi_major_axis       = self.calc_semi_major_axis(apogee, perigee)
+        self.semi_major_axis       = Orbit.calc_semi_major_axis(apogee, perigee)
         self.perigee               = self.Apsis(min(apogee, perigee), self.semi_major_axis)
         self.apogee                = self.Apsis(max(apogee, perigee), self.semi_major_axis)
 
@@ -57,14 +57,14 @@ class Orbit(object):
 
 
     @classmethod
-    def calc_semi_major_axis(self, apogee, perigee):
+    def calc_semi_major_axis(cls, apogee, perigee):
         ''' Calculates the semi-major axis given an apogee and perigee. '''
 
         return 0.5 * (perigee + apogee)
 
 
     @classmethod
-    def calc_velocity(self, sMajAxis, altitude):
+    def calc_velocity(cls, sMajAxis, altitude):
         ''' Calculates the velocity at altitude in an elliptical orbit with a given semi-major axis. '''
 
         return sqrt( (G_const * Earth.mass) * (2.0 / altitude - 1/sMajAxis) )
