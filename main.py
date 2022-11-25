@@ -7,7 +7,7 @@ from drag import *
 from constants import EARTH_RADIUS, g_earth
 import numpy as np
 from orbit import Orbit, keplerian_elements
-
+from dv import *
 
 
 def calc_gravity(a):
@@ -20,7 +20,7 @@ def simulate_launch(angle):
 
     # start of new simulation
     position     = Vector(0, 0, EARTH_RADIUS)
-    velocity     = Vector(0, 0, 7000)
+    velocity     = Vector(0, 0, 8000)
     acceleration = Vector(0, 0, -g_earth)
 
     launch_angle = math.radians(90-angle) # up angle from horizontal
@@ -105,17 +105,25 @@ if __name__=="__main__":
     rad = 0.1 # m
     cd = drag_coeff(math.radians(15))
 
-    angle = 10
+    angle = 7
     pos, vel = simulate_launch(angle)
 
     orbit = Orbit(*keplerian_elements(pos, vel))
     orbit_circ = Orbit(orbit.apogee.altitude, orbit.apogee.altitude)
+    dv = orbit_circ.apogee.velocity-orbit.apogee.velocity
+    isp = 250
+    mf = calc_mf(mass, dv, isp)
+
 
     print("VELOCITY: %.2f m/s" % vel.magnitude())
     print("ALTITUDE: %.2f m" % (pos.magnitude()-EARTH_RADIUS) )
     print("APOGEE: %.2f m" % (orbit.apogee.altitude - EARTH_RADIUS))
     print("PERIGEE: %.2f m" % (orbit.perigee.altitude - EARTH_RADIUS))
-    print("CIRC VELOCITY: %.2f m/s" % (orbit_circ.apogee.velocity-orbit.apogee.velocity))
+    print("CIRC VELOCITY: %.2f m/s" % dv)
+    print("PROP MASS: %.2f kg" % (mass-mf))
+    print("DRY MASS: %.2f kg" % mf)
+    print("MASS RATIO: %.2f" % (mass/mf))
+
 
 
 
