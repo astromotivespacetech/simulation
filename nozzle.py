@@ -30,6 +30,9 @@ def calcIsp(cs, gam, pe, pc):
 def throatArea(Wt, Pt, Tt, gam):
     return Wt / Pt * sqrt((R*Tt)/gam)
 
+def exitMachNum(Pc, gam):
+    return sqrt( (2/(gam-1)) * ((Pc/atm)**((gam-1)/gam) - 1) )
+
 
 Tc = 294
 Pc = psi2pascal(1000)
@@ -44,5 +47,16 @@ isp = calcIsp(Cstar, Helium.gam, Pe, Pc)
 Wdot = T / (isp * g)
 At = throatArea(Wdot, Pt, Tt, Helium.gam)
 Dt = sqrt(4*At/pi)
+Me = exitMachNum(Pc, Helium.gam)
 
-print(Tt, Pt, Cstar, isp, Wdot, At, Dt)
+
+print("Chamber Temp: %.2f K" % Tc)
+print("Throat Temp: %.2f K" % Tt)
+print("Chamber Pressure: %.2f psi" % pascal2psi(Pc))
+print("Throat Pressure: %.2f K" % pascal2psi(Pt))
+print("Cstar: %.2f m/s" % Cstar)
+print("Isp: %.2f s" % isp)
+print("Flow rate: %.2f kg/s" % Wdot)
+print("Throat Area: %.6f sq.m" % At)
+print("Throat Diameter: %.4f m" % Dt)
+print("Exit Mach Number: %.2f" % Me)
