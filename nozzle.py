@@ -3,21 +3,19 @@ from constants import g_earth, T_stp, atm_1, R_univ
 from conversions import psi2pascal, pascal2psi, lbf2newton, newton2lbf
 
 
-class Helium:
-    mol = 4.0026 # g/mol
-    gam = 1.667 # specific heat ratio
-    mach = 1020 # m/s
-    R = 2077.1 # J/kg K
+class Propellant(object):
+    def __init__(self, mol, gam, mach, r):
+        self.mol = mol
+        self.gam = gam
+        self.mach = mach
+        self.R = r
 
-class Air:
-    mol = 28.97
-    gam = 1.401
-    mach = 343
-    R = 287
+Helium = Propellant(4.0026, 1.667, 1020, 2077.1)
+Air = Propellant(28.97, 1.401, 343, 287)
 
 
 # choose monoprop gas
-gas = Air
+gas = Helium
 
 R = R_univ # 8.314 J/mol K
 atm = atm_1 # 101325 # Pascals
