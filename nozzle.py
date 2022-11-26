@@ -54,8 +54,17 @@ def pcns(Wdot, cs, At):
     return Wdot * cs * (1/(At))
 
 
+def exitVelocity(gam, r, t, pe, pc):
+    return sqrt( (2 * gam / (gam-1) ) * r * 1000 * t * (1-(pe/pc)**((gam-1)/gam)) )
+
+def k2r(x):
+    return x*1.8
+
+def f2m(x):
+    return x*0.3048
+
 Tc = 294 # K
-Pc = psi2pascal(1000)
+Pc = psi2pascal(2000)
 Pe = atm
 T = lbf2newton(1500)
 
@@ -71,6 +80,7 @@ Me = exitMachNum(Pc, gas.gam)
 Ae = exitArea(At, Me, gas.gam)
 De = 2*sqrt(Ae/pi)
 Pcns = pcns(Wdot, Cstar, At)
+Ve = exitVelocity(gas.gam, R, Tc, Pe, Pcns)
 
 print("Chamber Temp: %.2f K" % Tc)
 print("Throat Temp: %.2f K" % Tt)
@@ -81,6 +91,9 @@ print("Isp: %.2f s" % isp)
 print("Flow rate: %.2f kg/s" % Wdot)
 print("Throat Area: %.6f sq.m" % At)
 print("Throat Diameter: %.4f m" % Dt)
+print("Exit Velocity: %.2f m/s" % Ve)
 print("Exit Mach Number: %.2f" % Me)
+print("Speed of Sound at Exit: %.2f m/s" % (Ve/Me))
 print("Exit Area: %.6f sq.m" % Ae)
 print("Exit Diameter: %.4f m" % De)
+print("Area Ratio: %.2f" % (Ae/At))
