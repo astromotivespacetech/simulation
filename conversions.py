@@ -46,8 +46,8 @@ def cubicm2liter(x):
 def liter2cubicm(x):
     return x * 0.001
 
-def k2r(x):
+def kelvin2rankine(x):
     return x*1.8
 
-def f2m(x):
+def foot2meter(x):
     return x*0.3048
