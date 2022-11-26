@@ -45,3 +45,9 @@ def cubicm2liter(x):
 
 def liter2cubicm(x):
     return x * 0.001
+
+def k2r(x):
+    return x*1.8
+
+def f2m(x):
+    return x*0.3048

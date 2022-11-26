@@ -1,6 +1,6 @@
 from math import sqrt, pi
 from constants import g_earth, T_stp, atm_1, R_univ
-from conversions import psi2pascal, pascal2psi, lbf2newton, newton2lbf
+from conversions import *
 
 
 class Propellant(object):
@@ -57,11 +57,7 @@ def pcns(Wdot, cs, At):
 def exitVelocity(gam, r, t, pe, pc):
     return sqrt( (2 * gam / (gam-1) ) * r * 1000 * t * (1-(pe/pc)**((gam-1)/gam)) )
 
-def k2r(x):
-    return x*1.8
 
-def f2m(x):
-    return x*0.3048
 
 Tc = 294 # K
 Pc = psi2pascal(2000)
