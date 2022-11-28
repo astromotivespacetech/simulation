@@ -15,13 +15,13 @@ if __name__=="__main__":
 
     t = 0.1
     v = 0
-    a = g_earth * 1000
+    a = g_earth * 2000
 
     distances = []
     velocities = []
     times = []
 
-    for t in np.arange(0.01, 0.7, 0.01):
+    for t in np.arange(0.001, 0.05, 0.001):
 
         dist = dist_from_accel_time(v, a, t)
         vel = vel_from_time(v, a, t)
