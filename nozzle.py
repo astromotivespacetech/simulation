@@ -55,7 +55,7 @@ def pcns(Wdot, cs, At):
 
 
 def exitVelocity(gam, r, t, pe, pc):
-    return sqrt( (2 * gam / (gam-1) ) * r * 1000 * t * (1-(pe/pc)**((gam-1)/gam)) )
+    return sqrt( (2 * gam / (gam-1) ) * r * t * (1-(pe/pc)**((gam-1)/gam)) )
 
 
 
@@ -76,7 +76,7 @@ Me = exitMachNum(Pc, gas.gam)
 Ae = exitArea(At, Me, gas.gam)
 De = 2*sqrt(Ae/pi)
 Pcns = pcns(Wdot, Cstar, At)
-Ve = exitVelocity(gas.gam, R, Tc, Pe, Pcns)
+Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
 
 print("Chamber Temp: %.2f K" % Tc)
 print("Throat Temp: %.2f K" % Tt)

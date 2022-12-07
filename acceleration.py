@@ -13,9 +13,9 @@ def vel_from_time(v, a, t):
 
 if __name__=="__main__":
 
-    t = 0.1
+    # t = 0.1
     v = 0
-    a = g_earth * 2000
+    a = g_earth * 1000
 
     distances = []
     velocities = []
@@ -27,7 +27,7 @@ if __name__=="__main__":
         vel = vel_from_time(v, a, t)
 
         times.append(t)
-        distances.append(dist)
+        distances.append(dist*10)
         velocities.append(vel)
 
     plt.plot(times, distances, label="Length of Launch Track")
