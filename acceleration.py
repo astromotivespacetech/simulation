@@ -3,7 +3,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
 def dist_from_accel_time(v, a, t):
     return v*t + 0.5*a*t*t
 
