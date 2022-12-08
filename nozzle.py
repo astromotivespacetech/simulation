@@ -1,6 +1,7 @@
 from math import sqrt, pi
 from constants import g_earth, T_stp, atm_1, R_univ
 from conversions import *
+from name_equals_main import imported
 
 
 class Propellant(object):
@@ -59,37 +60,40 @@ def exitVelocity(gam, r, t, pe, pc):
 
 
 
-Tc = 294 # K
-Pc = psi2pascal(2000)
-Pe = atm
-T = lbf2newton(1500)
+if not imported(__name__):
 
-Tt = throatTemp(Tc, gas.gam)
-Pt = throatPress(Pc, gas.gam)
-Cstar = calcCstar(gas.gam, gas.R, Tc)
-isp = calcIsp(Cstar, gas.gam, Pe, Pc)
 
-Wdot = T / (isp * g)
-At = throatArea(Wdot, Pc, Cstar)
-Dt = 2*sqrt(At/pi)
-Me = exitMachNum(Pc, gas.gam)
-Ae = exitArea(At, Me, gas.gam)
-De = 2*sqrt(Ae/pi)
-Pcns = pcns(Wdot, Cstar, At)
-Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
+    Tc = 294 # K
+    Pc = psi2pascal(2000)
+    Pe = atm
+    T = lbf2newton(1500)
 
-print("Chamber Temp: %.2f K" % Tc)
-print("Throat Temp: %.2f K" % Tt)
-print("Chamber Pressure: %.2f psi" % pascal2psi(Pc))
-print("Throat Pressure: %.2f psi" % pascal2psi(Pt))
-print("Cstar: %.2f m/s" % Cstar)
-print("Isp: %.2f s" % isp)
-print("Flow rate: %.2f kg/s" % Wdot)
-print("Throat Area: %.6f sq.m" % At)
-print("Throat Diameter: %.4f m" % Dt)
-print("Exit Velocity: %.2f m/s" % Ve)
-print("Exit Mach Number: %.2f" % Me)
-print("Speed of Sound at Exit: %.2f m/s" % (Ve/Me))
-print("Exit Area: %.6f sq.m" % Ae)
-print("Exit Diameter: %.4f m" % De)
-print("Area Ratio: %.2f" % (Ae/At))
+    Tt = throatTemp(Tc, gas.gam)
+    Pt = throatPress(Pc, gas.gam)
+    Cstar = calcCstar(gas.gam, gas.R, Tc)
+    isp = calcIsp(Cstar, gas.gam, Pe, Pc)
+
+    Wdot = T / (isp * g)
+    At = throatArea(Wdot, Pc, Cstar)
+    Dt = 2*sqrt(At/pi)
+    Me = exitMachNum(Pc, gas.gam)
+    Ae = exitArea(At, Me, gas.gam)
+    De = 2*sqrt(Ae/pi)
+    Pcns = pcns(Wdot, Cstar, At)
+    Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
+
+    print("Chamber Temp: %.2f K" % Tc)
+    print("Throat Temp: %.2f K" % Tt)
+    print("Chamber Pressure: %.2f psi" % pascal2psi(Pc))
+    print("Throat Pressure: %.2f psi" % pascal2psi(Pt))
+    print("Cstar: %.2f m/s" % Cstar)
+    print("Isp: %.2f s" % isp)
+    print("Flow rate: %.2f kg/s" % Wdot)
+    print("Throat Area: %.6f sq.m" % At)
+    print("Throat Diameter: %.4f m" % Dt)
+    print("Exit Velocity: %.2f m/s" % Ve)
+    print("Exit Mach Number: %.2f" % Me)
+    print("Speed of Sound at Exit: %.2f m/s" % (Ve/Me))
+    print("Exit Area: %.6f sq.m" % Ae)
+    print("Exit Diameter: %.4f m" % De)
+    print("Area Ratio: %.2f" % (Ae/At))

@@ -1,4 +1,5 @@
 import math
+from name_equals_main import imported
 
 
 def transit_duration(velocity, length):
@@ -8,7 +9,7 @@ def taper_half_angle(len, rad):
     return math.atan( rad/len )
 
 
-if __name__=="__main__":
+if not imported(__name__):
 
     exhaust_velocity = 667 # m/s
 

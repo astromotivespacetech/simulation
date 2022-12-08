@@ -1,6 +1,7 @@
 from constants import g_earth
 import numpy as np
 from matplotlib import pyplot as plt
+from name_equals_main import imported
 
 
 def dist_from_accel_time(v, a, t):
@@ -10,7 +11,7 @@ def vel_from_time(v, a, t):
     return v + a*t
 
 
-if __name__=="__main__":
+if not imported(__name__)
 
     # t = 0.1
     v = 0
