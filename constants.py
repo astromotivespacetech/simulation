@@ -15,7 +15,7 @@ T_stp = 273.15
 G_const = 6.67259e-11
 
 # Atmospheric pressure at sea level [Pascals]
-atm_1 = 101325
+atm = 101325
 
 # Earth radius at poles [m]
 EARTH_RADIUS = 6356752

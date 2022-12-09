@@ -1,5 +1,5 @@
 from math import sqrt, pi
-from constants import g_earth, T_stp, atm_1, R_univ
+from constants import g_earth, T_stp, atm, R_univ
 from conversions import *
 from name_equals_main import imported
 
@@ -19,7 +19,6 @@ Air = Propellant(28.97, 1.401, 343, 287)
 gas = Helium
 
 R = R_univ # 8.314 J/mol K
-atm = atm_1 # 101325 # Pascals
 g = g_earth # 9.80665 m/s^2
 
 
@@ -43,8 +42,12 @@ def throatArea(Wdot, Pc, cs):
     return Wdot * cs * (1/Pc)
 
 
-def exitMachNum(Pc, gam):
-    return sqrt( (2/(gam-1)) * ((Pc/atm)**((gam-1)/gam) - 1) )
+def mach(t, gam, r):
+    return sqrt(gam * r * t)
+
+
+def machNum(v, a):
+    return v / a
 
 
 def exitArea(At, Me, gam):
@@ -59,33 +62,61 @@ def exitVelocity(gam, r, t, pe, pc):
     return sqrt( (2 * gam / (gam-1) ) * r * t * (1-(pe/pc)**((gam-1)/gam)) )
 
 
+def exitTemp(tcns, pe, pcns, gam):
+    return tcns * (pe / pcns)**((gam-1)/gam)
+
 
 if not imported(__name__):
 
 
     Tc = 294 # K
     Pc = psi2pascal(2000)
-    Pe = atm
     T = lbf2newton(1500)
+    Pe = atm # exit pressure
 
-    Tt = throatTemp(Tc, gas.gam)
-    Pt = throatPress(Pc, gas.gam)
-    Cstar = calcCstar(gas.gam, gas.R, Tc)
-    isp = calcIsp(Cstar, gas.gam, Pe, Pc)
+    target = inch2meter(4)
+    Ae = 0
+    De = 0
+    error = target - De
+    deriv = 0
+    egain = 100
+    dgain = 1000
+    gain = 500
 
-    Wdot = T / (isp * g)
-    At = throatArea(Wdot, Pc, Cstar)
-    Dt = 2*sqrt(At/pi)
-    Me = exitMachNum(Pc, gas.gam)
-    Ae = exitArea(At, Me, gas.gam)
-    De = 2*sqrt(Ae/pi)
-    Pcns = pcns(Wdot, Cstar, At)
-    Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
+
+    while error > 0.0001 :
+
+        Pe -= (error*egain + deriv*dgain) * gain
+
+        Cstar = calcCstar(gas.gam, gas.R, Tc)
+        isp = calcIsp(Cstar, gas.gam, Pe, Pc)
+        Wdot = T / (isp * g)
+        At = throatArea(Wdot, Pc, Cstar)
+        Pcns = pcns(Wdot, Cstar, At)
+        Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
+        Te = exitTemp(Tc, Pe, Pcns, gas.gam)
+        ae = mach(Te, gas.gam, gas.R)
+        Me = machNum(Ve, ae)
+        Ae = exitArea(At, Me, gas.gam)
+        Tt = throatTemp(Tc, gas.gam)
+        Pt = throatPress(Pc, gas.gam)
+        Dt = 2*sqrt(At/pi)
+        De = 2*sqrt(Ae/pi)
+
+        deriv = error - (target-De)
+        error = target - De
+
+
+
+
+
 
     print("Chamber Temp: %.2f K" % Tc)
     print("Throat Temp: %.2f K" % Tt)
+    print("Exit Temp: %.2f K" % Te)
     print("Chamber Pressure: %.2f psi" % pascal2psi(Pc))
     print("Throat Pressure: %.2f psi" % pascal2psi(Pt))
+    print("Exit Pressure: %.2f psi" % pascal2psi(Pe))
     print("Cstar: %.2f m/s" % Cstar)
     print("Isp: %.2f s" % isp)
     print("Flow rate: %.2f kg/s" % Wdot)

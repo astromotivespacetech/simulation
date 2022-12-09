@@ -11,17 +11,19 @@ def taper_half_angle(len, rad):
 
 if not imported(__name__):
 
-    exhaust_velocity = 667 # m/s
+    exhaust_velocity = 1704 # m/s
 
     rad = 1.62 # m
     len = 7 # m
 
-    vel = 1000 # m/s
+    vel = 7000 # m/s
 
-    # dt = transit_duration(vel, len)
-    # vt = transit_duration(exhaust_velocity, rad)
-    #
-    # print(dt > vt)
+    dt = transit_duration(vel, len)
+    vt = transit_duration(exhaust_velocity, rad)
+
+    print(dt, vt)
+
+    print(dt > vt)
 
 
     print( math.degrees(taper_half_angle(len,rad)) )
