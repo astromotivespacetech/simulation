@@ -2,6 +2,8 @@ from math import sqrt, pi
 from constants import g_earth, T_stp, atm, R_univ
 from conversions import *
 from name_equals_main import imported
+from matplotlib import pyplot as plt
+
 
 
 class Propellant(object):
@@ -68,46 +70,59 @@ def exitTemp(tcns, pe, pcns, gam):
 
 if not imported(__name__):
 
+    arr_thrust = []
+    arr_diameter = []
 
-    Tc = 294 # K
-    Pc = psi2pascal(2000)
-    T = lbf2newton(1500)
-    Pe = atm # exit pressure
-
-    target = inch2meter(4)
-    Ae = 0
-    De = 0
-    error = target - De
-    deriv = 0
-    egain = 100
-    dgain = 1000
-    gain = 500
+    for _ in range(100):
 
 
-    while error > 0.0001 :
+        Tc = 294 # K
+        Pc = psi2pascal(2200)
+        # T = lbf2newton( 2000 )
+        T = lbf2newton( (_ * 100)+10000 )
+        Pe = atm * 3 # exit pressure
 
-        Pe -= (error*egain + deriv*dgain) * gain
-
-        Cstar = calcCstar(gas.gam, gas.R, Tc)
-        isp = calcIsp(Cstar, gas.gam, Pe, Pc)
-        Wdot = T / (isp * g)
-        At = throatArea(Wdot, Pc, Cstar)
-        Pcns = pcns(Wdot, Cstar, At)
-        Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
-        Te = exitTemp(Tc, Pe, Pcns, gas.gam)
-        ae = mach(Te, gas.gam, gas.R)
-        Me = machNum(Ve, ae)
-        Ae = exitArea(At, Me, gas.gam)
-        Tt = throatTemp(Tc, gas.gam)
-        Pt = throatPress(Pc, gas.gam)
-        Dt = 2*sqrt(At/pi)
-        De = 2*sqrt(Ae/pi)
-
-        deriv = error - (target-De)
+        target = inch2meter(7)
+        Ae = 0
+        De = 0
         error = target - De
+        deriv = 0
+        egain = 100
+        dgain = 1000
+        gain = 100
+
+        print( newton2lbf(T))
 
 
+        while error > 0.0001 :
 
+            Pe -= (error*egain + deriv*dgain) * gain
+
+            Cstar = calcCstar(gas.gam, gas.R, Tc)
+            isp = calcIsp(Cstar, gas.gam, Pe, Pc)
+            Wdot = T / (isp * g)
+            At = throatArea(Wdot, Pc, Cstar)
+            Pcns = pcns(Wdot, Cstar, At)
+            Ve = exitVelocity(gas.gam, gas.R, Tc, Pe, Pcns)
+            Te = exitTemp(Tc, Pe, Pcns, gas.gam)
+            ae = mach(Te, gas.gam, gas.R)
+            Me = machNum(Ve, ae)
+            Ae = exitArea(At, Me, gas.gam)
+            Tt = throatTemp(Tc, gas.gam)
+            Pt = throatPress(Pc, gas.gam)
+            Dt = 2*sqrt(At/pi)
+            De = 2*sqrt(Ae/pi)
+
+            deriv = error - (target-De)
+            error = target - De
+
+            arr_thrust.append( newton2lbf(T) )
+            arr_diameter.append( meter2inch(Dt) )
+
+
+    plt.plot(arr_thrust, arr_diameter)
+    plt.grid()
+    plt.show()
 
 
 
@@ -121,10 +136,10 @@ if not imported(__name__):
     print("Isp: %.2f s" % isp)
     print("Flow rate: %.2f kg/s" % Wdot)
     print("Throat Area: %.6f sq.m" % At)
-    print("Throat Diameter: %.4f m" % Dt)
+    print("Throat Diameter: %.4f in" % meter2inch(Dt))
     print("Exit Velocity: %.2f m/s" % Ve)
     print("Exit Mach Number: %.2f" % Me)
     print("Speed of Sound at Exit: %.2f m/s" % (Ve/Me))
     print("Exit Area: %.6f sq.m" % Ae)
-    print("Exit Diameter: %.4f m" % De)
+    print("Exit Diameter: %.4f in" % meter2inch(De))
     print("Area Ratio: %.2f" % (Ae/At))
