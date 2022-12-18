@@ -97,7 +97,7 @@ class Nozzle(object):
 if not imported(__name__):
 
     # choose monoprop gas
-    gas = Hydrogen
+    gas = Air
 
     arr_thrust = []
     arr_diameter = []
@@ -105,12 +105,12 @@ if not imported(__name__):
     # for _ in range(100):
 
     Tc = 294 # K
-    Pc = psi2pascal( 5000)
-    T = lbf2newton( 100000 )
+    Pc = psi2pascal(2000)
+    T = lbf2newton(1500)
     # T = lbf2newton( (_ * 100)+10000 )
-    Pe = atm * 2.5 # exit pressure
+    Pe = atm # exit pressure
 
-    target = inch2meter(6)
+    target = inch2meter(4)
     Ae = 0
     De = 0
     error = target - De
@@ -133,6 +133,9 @@ if not imported(__name__):
 
         arr_thrust.append( newton2lbf(T) )
         arr_diameter.append( meter2inch(nozzle.Dt) )
+
+
+
 
 
     # plt.plot(arr_thrust, arr_diameter)
