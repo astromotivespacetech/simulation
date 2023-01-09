@@ -1,10 +1,11 @@
 import math
 from name_equals_main import imported
-from conversions import inch2meter, psi2pascal, lbf2newton
+from conversions import *
 from constants import g_earth, T_stp, atm, R_univ
 from nozzle import Nozzle, Propellant
 from idealgas import solve_n
-
+import numpy as np
+from matplotlib import pyplot as plt
 
 R = R_univ # 8.314 J/mol K
 g = g_earth # 9.80665 m/s^2
@@ -23,7 +24,9 @@ def taper_half_angle(len, rad):
 if not imported(__name__):
 
     Air = Propellant(28.97, 1.401, 343, 287)
-    gas = Air
+    Helium = Propellant(4.0026, 1.667, 1020, 2077.1)
+
+    gas = Helium
     Tc = 294 # K
     Pc = psi2pascal(2000)
     T = lbf2newton(1500)
@@ -32,10 +35,13 @@ if not imported(__name__):
 
     exhaust_velocity = nozzle.Ve # m/s
 
-    rad = inch2meter(2) # m
-    len = inch2meter(12) # m
+    # rad = inch2meter(1) # m
+    # len = inch2meter(2) # m
 
-    vel = 1000 # m/s
+    rad = 1
+    len = 1
+
+    vel = 7000 # m/s
 
     dt = transit_duration(vel, len)
     vt = transit_duration(exhaust_velocity, rad)
@@ -45,6 +51,58 @@ if not imported(__name__):
     moles = solve_n(Pc, vol, Tc)
     mass = moles * nozzle.gas.mol * 0.001
 
+    lens = []
+    lds = []
+    angles = []
+    dts = []
+    vts = []
+
+    for _ in np.arange(1, 20, 0.5):
+        len = _
+        dt = transit_duration(vel, len)
+
+        angles.append( math.degrees(taper_half_angle(len,rad)) )
+        lds.append(len/rad)
+        lens.append(len)
+        dts.append(dt)
+        vts.append(vt)
+
+
+
+    f = plt.figure()
+    f.set_figwidth(12)
+    f.set_figheight(9)
+    plt.plot(dts, angles, label="Transit Duration")
+    plt.plot(vts, angles, label="Firing Duration")
+    plt.yticks(np.arange(2, 45, 1))
+    plt.grid(color='#bbb', linestyle='-', linewidth=0.5)
+    plt.legend()
+    plt.ylabel("Taper half-angle (deg)")
+    plt.xlabel("Transit Duration (s)")
+    plt.title("Exhaust Velocity 1620 m/s, Projectile Rad 1 m Vel 7 km/s")
+    plt.show()
+
+
+
+
+
+    print("Chamber Temp: %.2f K" % nozzle.Tc)
+    print("Throat Temp: %.2f K" % nozzle.Tt)
+    print("Exit Temp: %.2f K" % nozzle.Te)
+    print("Chamber Pressure: %.2f psi" % pascal2psi(nozzle.Pc))
+    print("Throat Pressure: %.2f psi" % pascal2psi(nozzle.Pt))
+    print("Exit Pressure: %.2f psi" % pascal2psi(nozzle.Pe))
+    print("Cstar: %.2f m/s" % nozzle.Cstar)
+    print("Isp: %.2f s" % nozzle.isp)
+    print("Flow rate: %.2f kg/s" % nozzle.Wdot)
+    print("Throat Area: %.6f sq.m" % nozzle.At)
+    print("Throat Diameter: %.4f in" % meter2inch(nozzle.Dt))
+    print("Exit Velocity: %.2f m/s" % nozzle.Ve)
+    print("Exit Mach Number: %.2f" % nozzle.Me)
+    print("Speed of Sound at Exit: %.2f m/s" % (nozzle.Ve/nozzle.Me))
+    print("Exit Area: %.6f sq.m" % nozzle.Ae)
+    print("Exit Diameter: %.4f in" % meter2inch(nozzle.De))
+    print("Area Ratio: %.2f" % (nozzle.Ae/nozzle.At))
 
     print("Projectile Velocity: %i m/s" % vel)
     print("Projectile Radius: %.4f m" % rad)

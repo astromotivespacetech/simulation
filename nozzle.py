@@ -3,6 +3,7 @@ from constants import g_earth, T_stp, atm, R_univ
 from conversions import *
 from name_equals_main import imported
 from matplotlib import pyplot as plt
+import numpy as np
 
 R = R_univ # 8.314 J/mol K
 g = g_earth # 9.80665 m/s^2
@@ -97,67 +98,83 @@ class Nozzle(object):
 if not imported(__name__):
 
     # choose monoprop gas
-    gas = Air
+    gas = Helium
 
     arr_thrust = []
     arr_diameter = []
+    arr_exit = []
 
-    # for _ in range(100):
+    for _ in range(1, 501):
 
-    Tc = 294 # K
-    Pc = psi2pascal(2000)
-    T = lbf2newton(1500)
-    # T = lbf2newton( (_ * 100)+10000 )
-    Pe = atm # exit pressure
-
-    target = inch2meter(4)
-    Ae = 0
-    De = 0
-    error = target - De
-    deriv = 0
-    egain = 100
-    dgain = 1000
-    gain = 100
-
-    print( newton2lbf(T))
+        Tc = 294 # K
+        Pc = psi2pascal(3000)
+        # T = lbf2newton(100000)
+        T = lbf2newton( (_ * 1000) )
+        Pe = atm # exit pressure
 
 
-    while error > 0.0001 :
 
-        Pe -= (error*egain + deriv*dgain) * gain
+        print( newton2lbf(T))
 
         nozzle = Nozzle(gas, Tc, Pc, Pe, T)
-
-        deriv = error - (target-nozzle.De)
-        error = target - nozzle.De
-
         arr_thrust.append( newton2lbf(T) )
         arr_diameter.append( meter2inch(nozzle.Dt) )
+        arr_exit.append( meter2inch(nozzle.De) )
+
+        # target = inch2meter(5 + (_ * 0.1))
+        # Ae = 0
+        # De = 0
+        # error = target - De
+        # deriv = 0
+        # egain = 100
+        # dgain = 1000
+        # gain = 100
+
+        # while error > 0.0001 :
+        #
+        #     Pe -= (error*egain + deriv*dgain) * gain
+        #
+        #     nozzle = Nozzle(gas, Tc, Pc, Pe, T)
+        #
+        #     deriv = error - (target-nozzle.De)
+        #     error = target - nozzle.De
+        #
+        #     arr_thrust.append( newton2lbf(T) )
+        #     arr_diameter.append( meter2inch(nozzle.Dt) )
 
 
 
 
+    f = plt.figure()
+    f.set_figwidth(12)
+    f.set_figheight(9)
+    plt.xticks(np.arange(0, 550000, 50000))
+    plt.yticks(np.arange(0, 40, 1))
+    plt.plot(arr_thrust, arr_diameter, label="Throat Diameter")
+    plt.plot(arr_thrust, arr_exit, label="Exit Diameter")
+    plt.legend()
+    plt.ylabel("Inches")
+    plt.xlabel("Thrust (lbf)")
+    plt.title("1 Atm exit pressure, 3000 psi chamber")
+    plt.grid(color='#bbb', linestyle='-', linewidth=0.5)
+    plt.show()
 
-    # plt.plot(arr_thrust, arr_diameter)
-    # plt.grid()
-    # plt.show()
 
 
-
-    print("Chamber Temp: %.2f K" % nozzle.Tc)
-    print("Throat Temp: %.2f K" % nozzle.Tt)
-    print("Exit Temp: %.2f K" % nozzle.Te)
-    print("Chamber Pressure: %.2f psi" % pascal2psi(nozzle.Pc))
-    print("Throat Pressure: %.2f psi" % pascal2psi(nozzle.Pt))
-    print("Exit Pressure: %.2f psi" % pascal2psi(nozzle.Pe))
-    print("Cstar: %.2f m/s" % nozzle.Cstar)
-    print("Isp: %.2f s" % nozzle.isp)
-    print("Flow rate: %.2f kg/s" % nozzle.Wdot)
-    print("Throat Area: %.6f sq.m" % nozzle.At)
-    print("Throat Diameter: %.4f in" % meter2inch(nozzle.Dt))
-    print("Exit Velocity: %.2f m/s" % nozzle.Ve)
-    print("Exit Mach Number: %.2f" % nozzle.Me)
-    print("Speed of Sound at Exit: %.2f m/s" % (nozzle.Ve/nozzle.Me))
-    print("Exit Area: %.6f sq.m" % nozzle.Ae)
-    print("Exit Diameter: %.4f in" % meter2inch(nozzle.De))
-    print("Area Ratio: %.2f" % (nozzle.Ae/nozzle.At))
+    # print("Chamber Temp: %.2f K" % nozzle.Tc)
+    # print("Throat Temp: %.2f K" % nozzle.Tt)
+    # print("Exit Temp: %.2f K" % nozzle.Te)
+    # print("Chamber Pressure: %.2f psi" % pascal2psi(nozzle.Pc))
+    # print("Throat Pressure: %.2f psi" % pascal2psi(nozzle.Pt))
+    # print("Exit Pressure: %.2f psi" % pascal2psi(nozzle.Pe))
+    # print("Cstar: %.2f m/s" % nozzle.Cstar)
+    # print("Isp: %.2f s" % nozzle.isp)
+    # print("Flow rate: %.2f kg/s" % nozzle.Wdot)
+    # print("Throat Area: %.6f sq.m" % nozzle.At)
+    # print("Throat Diameter: %.4f in" % meter2inch(nozzle.Dt))
+    # print("Exit Velocity: %.2f m/s" % nozzle.Ve)
+    # print("Exit Mach Number: %.2f" % nozzle.Me)
+    # print("Speed of Sound at Exit: %.2f m/s" % (nozzle.Ve/nozzle.Me))
+    # print("Exit Area: %.6f sq.m" % nozzle.Ae)
+    # print("Exit Diameter: %.4f in" % meter2inch(nozzle.De))
+    # print("Area Ratio: %.2f" % (nozzle.Ae/nozzle.At))

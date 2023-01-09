@@ -20,8 +20,8 @@ if not imported(__name__):
     v = 7000
     d = 1250
     a = accel_from_vel_dist(v,d,0)
-    print(a/g_earth)
-    exit()
+    # print(a/g_earth)
+    # exit()
 
 
 

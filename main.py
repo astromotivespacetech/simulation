@@ -15,12 +15,12 @@ def calc_gravity(a):
 
 
 
-
 def simulate_launch(angle):
+
 
     # start of new simulation
     position     = Vector(0, 0, EARTH_RADIUS)
-    velocity     = Vector(0, 0, 8000)
+    velocity     = Vector(0, 0, 7000)
     acceleration = Vector(0, 0, -g_earth)
 
     launch_angle = math.radians(90-angle) # up angle from horizontal
@@ -34,6 +34,9 @@ def simulate_launch(angle):
     altitude = [position.magnitude() - EARTH_RADIUS]
     x = [projectile.vector[1].p]
     y = [projectile.vector[2].p]
+
+    dragforce = [0]
+    velocities = [0]
 
 
     # numerical integration loop
@@ -83,6 +86,8 @@ def simulate_launch(angle):
         velocity.update([pv[0].v, pv[1].v, pv[2].v])
         alt = position.magnitude() - EARTH_RADIUS
         altitude.append(alt)
+        dragforce.append(force)
+        velocities.append(velocity.magnitude())
 
         if alt < altitude[i-1]:
 
@@ -91,7 +96,23 @@ def simulate_launch(angle):
             # altitudes.append(alt)
             break
 
-    return position, velocity
+
+
+    fig, ax1 = plt.subplots()
+    fig.set_size_inches(12, 7)
+    ax2 = ax1.twinx()
+    ax3 = ax1.twinx()
+
+    ax1.plot(time, velocities)
+    ax2.plot(time, altitude)
+    ax3.plot(time, dragforce)
+
+    ax1.set_ylim([6000, 7000])
+
+    plt.show()
+
+
+    return x, y, position, velocity
 
 
 
@@ -106,7 +127,7 @@ if __name__=="__main__":
     cd = drag_coeff(math.radians(15))
 
     angle = 7
-    pos, vel = simulate_launch(angle)
+    x, y, pos, vel = simulate_launch(angle)
 
     orbit = Orbit(*keplerian_elements(pos, vel))
     orbit_circ = Orbit(orbit.apogee.altitude, orbit.apogee.altitude)
@@ -115,14 +136,14 @@ if __name__=="__main__":
     mf = calc_mf(mass, dv, isp)
 
 
-    print("VELOCITY: %.2f m/s" % vel.magnitude())
-    print("ALTITUDE: %.2f m" % (pos.magnitude()-EARTH_RADIUS) )
-    print("APOGEE: %.2f m" % (orbit.apogee.altitude - EARTH_RADIUS))
-    print("PERIGEE: %.2f m" % (orbit.perigee.altitude - EARTH_RADIUS))
-    print("CIRC VELOCITY: %.2f m/s" % dv)
-    print("PROP MASS: %.2f kg" % (mass-mf))
-    print("DRY MASS: %.2f kg" % mf)
-    print("MASS RATIO: %.2f" % (mass/mf))
+    # print("VELOCITY: %.2f m/s" % vel.magnitude())
+    # print("ALTITUDE: %.2f m" % (pos.magnitude()-EARTH_RADIUS) )
+    # print("APOGEE: %.2f m" % (orbit.apogee.altitude - EARTH_RADIUS))
+    # print("PERIGEE: %.2f m" % (orbit.perigee.altitude - EARTH_RADIUS))
+    # print("CIRC VELOCITY: %.2f m/s" % dv)
+    # print("PROP MASS: %.2f kg" % (mass-mf))
+    # print("DRY MASS: %.2f kg" % mf)
+    # print("MASS RATIO: %.2f" % (mass/mf))
 
 
 
@@ -133,12 +154,12 @@ if __name__=="__main__":
     # angles = []
     #
     # for angle in np.arange(1, 15, 0.5):
-    #     pos, vel = simulate_launch(angle)
+    #     x, y, pos, vel = simulate_launch(angle)
     #     angles.append(angle)
     #     altitudes.append(pos.magnitude()-EARTH_RADIUS)
     #     velocities.append(vel.magnitude())
-    #
-    #
+
+
     # fig, ax1 = plt.subplots()
     # ax2 = ax1.twinx()
     # fig.set_size_inches(10, 7)

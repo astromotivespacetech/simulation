@@ -19,7 +19,7 @@ if not imported(__name__):
     radiusPlug = 0.75 # in
     xareaPiston = xarea(radiusPiston)
     xareaPlug = xarea(radiusPlug)
-    pressure = 2000 # psi
+    pressure = 3000 # psi
     force = lbf2newton(pressure * xareaPiston) # N
     pistonMass = 1 # kg
     accel = accel_from_force_mass(force, pistonMass) # m/s2
