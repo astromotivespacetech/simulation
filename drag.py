@@ -1,5 +1,6 @@
 import math
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 # http://www.aerospaceweb.org/design/waverider/theory.shtml
@@ -25,6 +26,12 @@ if __name__=="__main__":
         cd = drag_coeff(ax)
         cds.append(cd)
 
-
-    plt.plot(cds)
+    fig, ax1 = plt.subplots()
+    fig.set_size_inches(12, 7)
+    plt.plot(cds, label="Drag Coefficient")
+    plt.xticks(np.arange(0, 91, 10))
+    plt.ylabel("Drag Coefficient")
+    plt.xlabel("Angle of Attack (deg)")
+    plt.title("Hypersonic Drag Coefficient from Angle of Attack")
+    plt.grid(color='#bbb', linestyle='-', linewidth=0.5)
     plt.show()

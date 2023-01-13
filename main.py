@@ -30,20 +30,25 @@ def simulate_launch(angle):
     projectile = StateVector(position, velocity)
 
     elapsed = 0
-    time = [elapsed]
-    altitude = [position.magnitude() - EARTH_RADIUS]
+    time = []
+    altitude = []
     x = [projectile.vector[1].p]
     y = [projectile.vector[2].p]
 
-    dragforce = [0]
-    velocities = [0]
+    dragforce = []
+    velocities = []
 
 
     # numerical integration loop
     for i in range( int(duration/dt) ):
 
+        try:
+            alt = altitude[i]
+        except:
+            alt = position.magnitude() - EARTH_RADIUS
+
         # calculate acceleration due to gravity
-        g = calc_gravity(altitude[i])
+        g = calc_gravity(alt)
 
         # reinitialize acceleration each iteration
         acceleration = position.copy().unit()
@@ -54,7 +59,7 @@ def simulate_launch(angle):
         vel = velocity.magnitude()
 
         # get atmospheric density at current altitude
-        rho = Atmosphere.calc_rho(altitude[i])
+        rho = Atmosphere.calc_rho(alt)
 
         # calculate drag force
         force = calc_drag(cd, rad, rho, vel)
@@ -99,20 +104,61 @@ def simulate_launch(angle):
 
 
     fig, ax1 = plt.subplots()
-    fig.set_size_inches(12, 7)
+    fig.subplots_adjust(right=0.75)
+
+    fig.set_size_inches(15, 8)
     ax2 = ax1.twinx()
     ax3 = ax1.twinx()
-
-    ax1.plot(time, velocities)
-    ax2.plot(time, altitude)
-    ax3.plot(time, dragforce)
+    ax3.spines["right"].set_position(("axes", 1.2))
+    ax1.plot(time, velocities, label="Velocity", color='b')
+    ax2.plot(time, altitude, label="Altitude", color='g')
+    ax3.plot(time, dragforce, label="Drag Force", color='r')
 
     ax1.set_ylim([6000, 7000])
+    # ax2.set_ylim([0, 350000])
+
+    ax1.set_ylabel("Velocity (m/s)")
+    ax2.set_ylabel("Altitude (m")
+    ax3.set_ylabel("Drag Force (N)")
+
+    # ax1.legend(loc='upper left')
+    # ax2.legend(loc='upper center')
+    # ax3.legend(loc='upper right')
+
+    align_yaxis(ax2, 0, ax3, 0)
+
+    ax1.set_xlabel("Time (s)")
+    fig.legend(loc=2)
+# fig.subplots_adjust(right=0.75)
+    plt.grid(color='#bbb', linestyle='-', linewidth=0.5)
 
     plt.show()
 
 
     return x, y, position, velocity
+
+
+
+def align_yaxis(a1, v1, a2, v2):
+    """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+    _, y1 = a1.transData.transform((0, v1))
+    _, y2 = a2.transData.transform((0, v2))
+    adjust_yaxis(a2,(y1-y2)/2,v2)
+    adjust_yaxis(a1,(y2-y1)/2,v1)
+
+def adjust_yaxis(ax,ydif,v):
+    """shift axis ax by ydiff, maintaining point v at the same location"""
+    inv = ax.transData.inverted()
+    _, dy = inv.transform((0, 0)) - inv.transform((0, ydif))
+    miny, maxy = ax.get_ylim()
+    miny, maxy = miny - v, maxy - v
+    if -miny>maxy or (-miny==maxy and dy > 0):
+        nminy = miny
+        nmaxy = miny*(maxy+dy)/(miny+dy)
+    else:
+        nmaxy = maxy
+        nminy = maxy*(miny+dy)/(maxy+dy)
+    ax.set_ylim(nminy+v, nmaxy+v)
 
 
 
@@ -126,7 +172,7 @@ if __name__=="__main__":
     rad = 0.1 # m
     cd = drag_coeff(math.radians(15))
 
-    angle = 7
+    angle = 12
     x, y, pos, vel = simulate_launch(angle)
 
     orbit = Orbit(*keplerian_elements(pos, vel))
