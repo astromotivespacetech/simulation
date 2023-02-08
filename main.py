@@ -1,6 +1,7 @@
 import math
 from vector import Vector
 from standard_atmosphere import Atmosphere
+from earth import Earth
 from rk4 import *
 from matplotlib import pyplot as plt
 from drag import *
@@ -8,6 +9,7 @@ from constants import EARTH_RADIUS, g_earth
 import numpy as np
 from orbit import Orbit, keplerian_elements
 from dv import *
+import simplekml
 
 
 def calc_gravity(a):
@@ -22,6 +24,10 @@ def simulate_launch(angle):
     position     = Vector(0, 0, EARTH_RADIUS)
     velocity     = Vector(0, 0, 7000)
     acceleration = Vector(0, 0, -g_earth)
+
+    kml = simplekml.Kml()
+    trajectory = kml.newlinestring(name="Trajectory")
+    trajectory.altitudemode = simplekml.AltitudeMode.relativetoground
 
     launch_angle = math.radians(90-angle) # up angle from horizontal
     axis = Vector(-1,0,0)
@@ -93,8 +99,12 @@ def simulate_launch(angle):
         altitude.append(alt)
         dragforce.append(force)
         velocities.append(velocity.magnitude())
+        lat, lon, a = Earth.get_lat_lon(position)
+        trajectory.coords.addcoordinates([(math.degrees(lon),math.degrees(lat),round(a))])
+
 
         if alt < altitude[i-1]:
+            print(alt, altitude[i-1])
 
             # angles.append(angle)
             # velocities.append(velocity.magnitude())
@@ -102,6 +112,38 @@ def simulate_launch(angle):
             break
 
 
+    #plot_telemetry(time, velocities, altitude, dragforce)
+    kml.save("trajectory.kml")
+
+    return x, y, position, velocity, trajectory
+
+
+
+
+def align_yaxis(a1, v1, a2, v2):
+    """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
+    _, y1 = a1.transData.transform((0, v1))
+    _, y2 = a2.transData.transform((0, v2))
+    adjust_yaxis(a2,(y1-y2)/2,v2)
+    adjust_yaxis(a1,(y2-y1)/2,v1)
+
+def adjust_yaxis(ax,ydif,v):
+    """shift axis ax by ydiff, maintaining point v at the same location"""
+    inv = ax.transData.inverted()
+    _, dy = inv.transform((0, 0)) - inv.transform((0, ydif))
+    miny, maxy = ax.get_ylim()
+    miny, maxy = miny - v, maxy - v
+    if -miny>maxy or (-miny==maxy and dy > 0):
+        nminy = miny
+        nmaxy = miny*(maxy+dy)/(miny+dy)
+    else:
+        nmaxy = maxy
+        nminy = maxy*(miny+dy)/(maxy+dy)
+    ax.set_ylim(nminy+v, nmaxy+v)
+
+
+
+def plot_telemetry(time, velocities, altitude, dragforce):
 
     fig, ax1 = plt.subplots()
     fig.subplots_adjust(right=0.75)
@@ -135,30 +177,7 @@ def simulate_launch(angle):
     plt.show()
 
 
-    return x, y, position, velocity
 
-
-
-def align_yaxis(a1, v1, a2, v2):
-    """adjust ax2 ylimit so that v2 in ax2 is aligned to v1 in ax1"""
-    _, y1 = a1.transData.transform((0, v1))
-    _, y2 = a2.transData.transform((0, v2))
-    adjust_yaxis(a2,(y1-y2)/2,v2)
-    adjust_yaxis(a1,(y2-y1)/2,v1)
-
-def adjust_yaxis(ax,ydif,v):
-    """shift axis ax by ydiff, maintaining point v at the same location"""
-    inv = ax.transData.inverted()
-    _, dy = inv.transform((0, 0)) - inv.transform((0, ydif))
-    miny, maxy = ax.get_ylim()
-    miny, maxy = miny - v, maxy - v
-    if -miny>maxy or (-miny==maxy and dy > 0):
-        nminy = miny
-        nmaxy = miny*(maxy+dy)/(miny+dy)
-    else:
-        nmaxy = maxy
-        nminy = maxy*(miny+dy)/(maxy+dy)
-    ax.set_ylim(nminy+v, nmaxy+v)
 
 
 
@@ -173,7 +192,12 @@ if __name__=="__main__":
     cd = drag_coeff(math.radians(15))
 
     angle = 12
-    x, y, pos, vel = simulate_launch(angle)
+
+
+    x, y, pos, vel, trajectory = simulate_launch(angle)
+
+
+
 
     orbit = Orbit(*keplerian_elements(pos, vel))
     orbit_circ = Orbit(orbit.apogee.altitude, orbit.apogee.altitude)
