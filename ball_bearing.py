@@ -1,15 +1,15 @@
+# https://wp.optics.arizona.edu/optomech/wp-content/uploads/sites/53/2016/10/Tutorial_LeCainNicholas.pdf
+
 from math import pi, atan2
 
-
-
-F = 200 # N
+F = 1000 # N
 
 
 inf = float('inf')
 
 GPa = 1000 # MPa
-e1 = 210*GPa # GPa
-e2 = 210*GPa # GPa
+e1 = 207*GPa # GPa
+e2 = 207*GPa # GPa
 v1 = 0.28
 v2 = 0.28
 r1 = 6.35 * 0.5 # mm [0.25"]
@@ -45,7 +45,7 @@ maxstress = (omx-omz)/2
 
 
 
-print(a)
-print(Pmax)
-print(omx, omz)
-print(maxstress)
+print("Contact area: %.3f sq.mm" % a)
+print("Max pressure: %.1f N/mm2" % Pmax)
+print("Shear/Normal Stress: %.2f, %.2f MPa" % (omx, omz))
+print("Max Stress: %.2f MPa" % maxstress)
