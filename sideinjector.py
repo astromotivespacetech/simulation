@@ -23,37 +23,45 @@ if not imported(__name__):
     radiusPlug = 0.75 # in
     xareaPiston = xarea(radiusPiston)
     xareaPlug = xarea(radiusPlug)
-    pressure = 3000 # psi
+    pressure = 1000 # psi
     force = lbf2newton(pressure * xareaPiston) # N
-    pistonMass = 1 # kg
+    pistonMass = 1.48 # kg
+    plugMass = 0.176 # kg
     accel = accel_from_force_mass(force, pistonMass) # m/s2
-    displacement = inch2meter(radiusPlug)
+    displacement = inch2meter(radiusPlug) * 2
 
     dists = []
-    vels = []
+    vpiston = []
+    vplug = []
     acts = []
 
     for _ in np.arange(1.0, 10.0, 0.25):
 
         dist = inch2meter(_)
         velocity = vel_from_dist_accel(dist, accel) # m/s
-        actuation = displacement / velocity
+        vf1 = (pistonMass - plugMass) * velocity / (pistonMass + plugMass)
+        vf2 = 2*pistonMass*velocity / (pistonMass + plugMass)
 
         dists.append(dist)
-        vels.append(velocity)
-        acts.append(actuation)
+        vpiston.append(velocity)
+        vplug.append(vf2)
+        acts.append(displacement/vf2)
 
     fig, ax1 = plt.subplots()
     fig.set_size_inches(12, 7)
     ax2 = ax1.twinx()
-    ax1.plot(dists, vels, label="Velocity", color='r')
+    # ax3 = ax1.twinx()
+    ax1.plot(dists, vpiston, label="Piston Velocity", color='r')
     ax2.plot(dists, acts, label="Actuation Time")
+    ax1.plot(dists, vplug, label="Plug Velocity", color='g')
     ax1.legend(loc=0)
     ax2.legend(loc=0)
+    # ax3.legend(loc=0)
     ax1.set_xlabel("Distance (m)")
     ax1.set_ylabel("Velocity (m/s)")
     ax2.set_ylabel("Time (s)")
-    plt.title("3 ksi chamber, 1 kg piston mass, 1 in piston radius")
+    # ax3.set_ylabel("Velocity (m/s)")
+    plt.title("1 ksi chamber, 1 kg piston mass, 1 in piston radius")
     plt.grid(color='#bbb', linestyle='-', linewidth=0.5)
     plt.show()
 
@@ -64,4 +72,4 @@ if not imported(__name__):
     print("Acceleration: %.2f m/s^2" % accel)
     print("Velocity: %.2f m/s" % velocity)
     print("Actuation Displacement: %.2f in" % meter2inch(displacement))
-    print("Actuation Time: %.4f s" % actuation)
+    # print("Actuation Time: %.4f s" % actuation)

@@ -1,11 +1,12 @@
 // pin definitions
-#define FUEL_DIR_PIN      1
-#define FUEL_STEP_PIN     2
-#define FUEL_ENA_PIN      3
-#define LOX_DIR_PIN       4
-#define LOX_STEP_PIN      5
-#define LOX_ENA_PIN       6
-#define PROX_PIN          7
+#define FUEL_DIR_PIN      2
+#define FUEL_STEP_PIN     3
+#define FUEL_ENA_PIN      4
+#define FUEL_PROX_PIN     5
+#define LOX_DIR_PIN       6
+#define LOX_STEP_PIN      7
+#define LOX_ENA_PIN       8
+#define LOX_PROX_PIN      9
 #define CLOCKWISE         LOW
 #define COUNTERCLOCKWISE  HIGH
 
@@ -28,12 +29,15 @@ float steps_per_sec = microsteps * speed * ratio;
 unsigned long step_delay = (unsigned long)(1.0 / steps_per_sec * 0.5 * 1e6);
 
 
+// note: you could specify a lox_step_delay and a fuel_step_delay if you want different actuation speeds
+
 
 // motor class
 struct Motor {
   int dirPin;
   int stepPin;
   int enaPin;
+  int proxPin;
   int dirState;
   int stepState;
   int enaState;
@@ -44,25 +48,49 @@ struct Motor {
   int offset;                 // number of steps relative to the prox sensor for 'closed' - must be calibrated
 };
 
+
+// tune your homing procedure by changing these values until the valves are in a closed position
+int fuel_offset = 50;
+int lox_offset = 50;
+
 // initialize motor objects
-Motor Fuel { FUEL_DIR_PIN, FUEL_STEP_PIN, FUEL_ENA_PIN, LOW, LOW, LOW, 0, step_delay, 0, 0, 0 };
-Motor Lox { LOX_DIR_PIN, LOX_STEP_PIN, LOX_ENA_PIN, LOW, LOW, LOW, 0, step_delay, 0, 0, 0 };
+Motor Fuel { FUEL_DIR_PIN, FUEL_STEP_PIN, FUEL_ENA_PIN, FUEL_PROX_PIN, LOW, LOW, LOW, 0, step_delay, 0, 0, fuel_offset };
+Motor Lox { LOX_DIR_PIN, LOX_STEP_PIN, LOX_ENA_PIN, LOX_PROX_PIN, LOW, LOW, LOW, 0, step_delay, 0, 0, lox_offset };
 
 
 
 void setup() {
 
   // Serial port stuff
+  Serial.begin(115200);
+
   // pinmode stuff
+  pinMode(FUEL_DIR_PIN, OUTPUT);
+  pinMode(FUEL_STEP_PIN, OUTPUT);
+  pinMode(FUEL_ENA_PIN, OUTPUT);
+  pinMode(FUEL_PROX_PIN, INPUT);
+  pinMode(LOX_DIR_PIN, OUTPUT);
+  pinMode(LOX_STEP_PIN, OUTPUT);
+  pinMode(LOX_ENA_PIN, OUTPUT);
+  pinMode(LOX_PROX_PIN, INPUT);
+
+
+  // Enable the drivers so that we can run the homing function
+  Fuel.enaState = HIGH;
+  Lox.enaState = HIGH;
+  digitalWrite(Fuel.enaPin, Fuel.enaState);
+  digitalWrite(Lox.enaPin, Lox.enaState);
+
 
   // Call valve homing function to ensure valves start in a known position.
-  // Homing function will automatically enable the motor drivers.
   valveHome(&Fuel);
   valveHome(&Lox);
 
 
   // Now that our valves are in a known position, pull the enable pins low in order to disable
   // the motor drivers e.g. 'disarmed'.
+  Fuel.enaState = LOW;
+  Lox.enaState = LOW;
   digitalWrite(Fuel.enaPin, Fuel.enaState);
   digitalWrite(Lox.enaPin, Lox.enaState);
 }
@@ -73,7 +101,25 @@ void loop() {
 
   // Do all program stuff here e.g. sensors, state machine, send+receive  commands, etc.
   //
-  //
+
+  // Here you can update the motor target
+  Fuel.target = 0;
+  Lox.target = 0;
+
+  // Here you can enable or disable the motor drivers
+  int fuelEnaState = LOW;
+  int loxEnaState = LOW;
+
+  // check if the above enable command differs from the motor enaState variable
+  if (fuelEnaState != Fuel.enaState) {
+    Fuel.enaState = fuelEnaState;
+    digitalWrite(Fuel.enaPin, Fuel.enaState);
+  }
+
+  if (loxEnaState != Lox.enaState) {
+    Lox.enaState = loxEnaState;
+    digitalWrite(Lox.enaPin, Lox.enaState);
+  }
 
   // call valve operate with each motor
   valveOperate(&Fuel);
@@ -96,7 +142,6 @@ void valveOperate(Motor *m) {
 
       // update the motor's dirState and write to driver
       if (dirState != m->dirState) {
-
         m->dirState = dirState;
         digitalWrite(m->dirPin, m->dirState);
       }
@@ -137,9 +182,6 @@ void valveHome(Motor *m) {
   // lets make sure we debounce our proximity sensor
   int proxDebounce = 0;
 
-  // enable the motor driver
-  digitalWrite(m->enaPin, HIGH);
-
   // need to get 5 consecutive readings
   while (proxDebounce < 5) {
 
@@ -148,11 +190,8 @@ void valveHome(Motor *m) {
 
     // increment proxDebounce if we get consistent readings, otherwise start over
     if (prox == proxState) {
-
       proxDebounce++;
-
     } else {
-
       proxDebounce = 0;
     }
 
@@ -161,19 +200,12 @@ void valveHome(Motor *m) {
   }
 
 
+  // update the target, depending on the current proxState. This will automatically result in
+  // either a clockwise or counterclockwise rotation
   if (proxState) {
-
-    // if the proxState is HIGH to begin with, then we know we can rotate counterclockwise
-    // to find the leading edge in the clockwise directon.
-    m->dirState = LOW;
-    digitalWrite(m->dirPin, m->dirState);
-
+    m->target = -microsteps;
   } else {
-
-    // if the proxState is LOW to begin with, let's rotate clockwise until we get a HIGH
-    // reading from the proximity sensor
-    m->dirState = CLOCKWISE;
-    digitalWrite(m->dirPin, m->dirState);
+    m->target = microsteps
   }
 
 
@@ -185,37 +217,25 @@ void valveHome(Motor *m) {
     // moving 'X' number of steps past this based on our manual calibration, which we define in
     // our motor's 'offset' parameter.
 
-    // check to see if motor is ready to move another step
-    if (micros() - m->prevStep > m->stepDelay) {
-
-      // increment the motor step
-      m->stepState = (m->stepState) ? LOW : HIGH;  // toggle from high to low or vice versa
-
-      // write to pin
-      digitalWrite(m->stepPin, m->stepState);
-
-      // update prevStep
-      m->prevStep = micros();
-    }
+    valveOperate(&m);
 
     // check to see if homed
-    int homed = checkProx(&proxState);
+    int homed = checkProx(&proxState, m->proxPin);
   }
 
   // now that our valve is homed, move the valve to the closed position
   if (homed) {
 
-    // rotate clockwise for consistency
-    m->dirState = CLOCKWISE;
-    digitalWrite(m->dirPin, m->dirState);
+    // let's zero out the stepCount
+    m->stepCount = 0;
 
-    // we can just do a loop at this point
-    for (int i = 0; i <= m->offset; i++) {
+    // and let's set the target to be the motor offset, and since the stepCount is zero,
+    // the target will be greater so it should automatically rotate clockwise
+    m->target = m->offset;
 
-      digitalWrite(m->stepPin, HIGH);
-      delayMicroseconds(m->stepDelay);
-      digitalWrite(m->stepPin, LOW);
-      delayMicroseconds(m->stepDelay);
+    // keep going until we reach the target
+    while (m->stepCount != m->target) {
+      valveOperate(&m);
     }
 
     // valve should now be in the 'CLOSED' position, so lets set the stepCount to 0
@@ -230,38 +250,34 @@ void valveHome(Motor *m) {
 
 
 
-int checkProx(int *ps) {
+int checkProx(int *ps, int proxPin) {
 
   status = false;
 
   // if proximity sensor is now reading different from proxState
-  if (digitalRead(PROX_PIN) != ps) {
+  if (digitalRead(proxPin) != ps) {
 
     // new debounce variable
     int debounce = 0;
-
     bool checking = true;
 
     // keep going until no longer checking
     while (checking) {
 
       // take new reading
-      prox = digitalRead(PROX_PIN);
+      prox = digitalRead(proxPin);
 
       // increment proxDebounce if we get consistent readings, otherwise start over
       if (prox == ps) {
-
         debounce++;
 
       } else {
-
         debounce = 0;
         checking = false;
       }
 
       // if we get 5 consecutive readings, then we can confirm!
       if (debounce == 5) {
-
         status = true;
         checking = false;
       }
