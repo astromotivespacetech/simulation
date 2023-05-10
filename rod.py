@@ -11,17 +11,28 @@ force_plug = xarea_plug * pressure
 min_xarea_rod = force_plug / tensile_cf
 min_radius_rod = (min_xarea_rod / pi) ** 0.5
 
-diameter_rod = 1
+diameter_rod = 0.75
 radius_rod = diameter_rod * 0.5
 xarea_rod = pi * radius_rod**2
 tensile_rod = xarea_rod * tensile_cf
+
+
+od_steel_tube = diameter_rod + 0.25
+id_steel_tube = diameter_rod
+tensile_steel = 150000 # psi
+od_xarea_steel_tube = pi * (od_steel_tube*0.5)**2
+id_xarea_steel_tube = pi * (id_steel_tube*0.5)**2
+xarea_steel_tube = od_xarea_steel_tube = id_xarea_steel_tube
+tensile_steel_tube = xarea_steel_tube * tensile_steel
 
 
 print("Plug Force: %.2f lbf" % force_plug)
 print("Min Rod Diameter: %.2f in" % (min_radius_rod*2))
 print("Rod Diameter: %.2f in" % diameter_rod)
 print("Rod Tensile Strength: %.2f lbf" % tensile_rod)
-print("Tensile Margin: %.2f lbf" % (tensile_rod-force_plug))
+print("Steel Tube Tensile Strength: %.2f lbf" % tensile_steel_tube)
+print("Plug Shaft Tensile Stength: %.2f lbf" % (tensile_rod+tensile_steel_tube))
+print("Tensile Margin: %.2f lbf" % ((tensile_rod+tensile_steel_tube)-force_plug))
 
 Master_Bond_EP31_shear = 4600 # psi
 
