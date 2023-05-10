@@ -1,4 +1,5 @@
 # https://wp.optics.arizona.edu/optomech/wp-content/uploads/sites/53/2016/10/Tutorial_LeCainNicholas.pdf
+# https://amesweb.info/HertzianContact/HertzianContact.aspx
 
 from math import pi, atan2
 
