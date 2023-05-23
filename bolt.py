@@ -19,10 +19,10 @@ stress_area = tensile_stress_area[bolt][1] # sq. in
 shear_strength_factor = 0.6 # 60% of tensile strength [https://www.portlandbolt.com/technical/faqs/calculating-shear-strength-of-grade-8-bolts/]
 grade_8_shear_strength = grade_8_min_tensile * shear_strength_factor
 shear = grade_8_shear_strength * stress_area
-num_bolts = 8
+num_bolts = 12
 max_force = num_bolts * shear
 pressure = 2000 # psi
-radiusPiston = 2.5 # in
+radiusPiston = 3 # in
 radiusChamber = 4.913 # in
 xareaPiston = xarea(radiusPiston)
 xareaChamber = xarea(radiusChamber)
@@ -37,6 +37,7 @@ print("Grade 8 Shear Strength %i lbf" % grade_8_shear_strength)
 print("Bolt Shear Strength: %i lbf" % shear)
 print("Nozzle Cross-Sectional Area: %.2f sq.in" % xareaChamber)
 print("Nozzle Load: %i lbf" % pressureNozzle)
+print("Number of Bolts: %i" % num_bolts)
 print("Max Force: %i lbf" % max_force)
 print("Chamber Cap Load: %i lbf" % pressureChamberCap)
 print("Piston Load: %i lbf" % pressurePiston)

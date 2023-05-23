@@ -19,14 +19,14 @@ def vel_from_dist_accel(d, a):
 
 if not imported(__name__):
 
-    radiusPiston = 1 # in
-    radiusPlug = 0.75 # in
+    radiusPiston = 3 # in
+    radiusPlug = 3 # in
     xareaPiston = xarea(radiusPiston)
     xareaPlug = xarea(radiusPlug)
-    pressure = 1000 # psi
+    pressure = 2000 # psi
     force = lbf2newton(pressure * xareaPiston) # N
-    pistonMass = 1.48 # kg
-    plugMass = 0.176 # kg
+    pistonMass = 19.6 # kg
+    plugMass = 3.45 # kg
     accel = accel_from_force_mass(force, pistonMass) # m/s2
     displacement = inch2meter(radiusPlug) * 2
 
@@ -42,7 +42,7 @@ if not imported(__name__):
         vf1 = (pistonMass - plugMass) * velocity / (pistonMass + plugMass)
         vf2 = 2*pistonMass*velocity / (pistonMass + plugMass)
 
-        dists.append(dist)
+        dists.append( meter2inch(dist))
         vpiston.append(velocity)
         vplug.append(vf2)
         acts.append(displacement/vf2)
@@ -55,7 +55,7 @@ if not imported(__name__):
     ax1.plot(dists, vplug, label="Plug Velocity", color='g')
     ax1.legend(loc=0)
     ax2.legend(loc=0)
-    ax1.set_xlabel("Distance (m)")
+    ax1.set_xlabel("Distance (in)")
     ax1.set_ylabel("Velocity (m/s)")
     ax2.set_ylabel("Time (s)")
     plt.title("1 ksi chamber, 1 kg piston mass, 1 in piston radius")

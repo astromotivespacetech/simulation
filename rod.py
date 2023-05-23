@@ -19,7 +19,7 @@ tensile_rod = xarea_rod * tensile_cf
 
 od_steel_tube = diameter_rod + 0.25
 id_steel_tube = diameter_rod
-tensile_steel = 150000 # psi
+tensile_steel = 70000 # psi
 od_xarea_steel_tube = pi * (od_steel_tube*0.5)**2
 id_xarea_steel_tube = pi * (id_steel_tube*0.5)**2
 xarea_steel_tube = od_xarea_steel_tube = id_xarea_steel_tube
@@ -34,9 +34,10 @@ print("Steel Tube Tensile Strength: %.2f lbf" % tensile_steel_tube)
 print("Plug Shaft Tensile Stength: %.2f lbf" % (tensile_rod+tensile_steel_tube))
 print("Tensile Margin: %.2f lbf" % ((tensile_rod+tensile_steel_tube)-force_plug))
 
-Master_Bond_EP31_shear = 4600 # psi
+#Master_Bond_EP31_shear = 4600 # psi
+Master_Bond_10AOHT_shear = 3500 # psi
 
-min_bond_surface_area = force_plug / Master_Bond_EP31_shear
+min_bond_surface_area = force_plug / Master_Bond_10AOHT_shear
 
 print("Minimum bonding surface area: %.2f sq.in" % min_bond_surface_area)
 
@@ -50,22 +51,23 @@ bond_surface_area = bond_length * 2 * pi * radius_rod
 
 print("Bond surface area: %.2f sq.in" % bond_surface_area)
 
-bond_shear_strength = Master_Bond_EP31_shear * bond_surface_area
+bond_shear_strength = Master_Bond_10AOHT_shear * bond_surface_area
 
 print("Bond shear strength: %.2f lbf" % bond_shear_strength)
 
 
 vel = 40 # m/s
 
-dt = 0.0005
+dt = 0.00025
 
 accel = vel / dt
 
 print("Acceleration: %i m/s2" % accel)
 
-mass = 3.45 # kg
+plug_mass = 3.45 # kg
+piston_mass = 19.6 # kg
 
-F = mass * accel # N
+F = plug_mass * accel # N
 
 force = F * 0.224809
 

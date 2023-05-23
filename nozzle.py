@@ -98,16 +98,18 @@ class Nozzle(object):
 if not imported(__name__):
 
     # choose monoprop gas
-    gas = Helium
+    gas = Air
 
     arr_thrust = []
     arr_diameter = []
     arr_exit = []
 
+    Tc = 294 # K
+    psi = 2000
+    Pc = psi2pascal(psi)
+
     for _ in range(1, 501):
 
-        Tc = 294 # K
-        Pc = psi2pascal(3000)
         # T = lbf2newton(100000)
         T = lbf2newton( (_ * 1000) )
         Pe = atm # exit pressure
@@ -155,7 +157,7 @@ if not imported(__name__):
     plt.legend()
     plt.ylabel("Inches")
     plt.xlabel("Thrust (lbf)")
-    plt.title("1 Atm exit pressure, 3000 psi chamber")
+    plt.title("1 Atm exit pressure," + str(psi) + " psi chamber")
     plt.grid(color='#bbb', linestyle='-', linewidth=0.5)
     plt.show()
 
