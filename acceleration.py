@@ -20,7 +20,7 @@ def dist_from_accel_vel(a, v):
 if not imported(__name__):
 
 
-    v = 7000 # target velocity
+    v = 3700 # target velocity
 
     gs = []
     dists = []

@@ -22,7 +22,7 @@ def simulate_launch(angle):
 
     # start of new simulation
     position     = Vector(0, 0, EARTH_RADIUS)
-    velocity     = Vector(0, 0, 7000)
+    velocity     = Vector(0, 0, 8000)
     acceleration = Vector(0, 0, -g_earth)
 
     kml = simplekml.Kml()
@@ -97,7 +97,7 @@ def simulate_launch(angle):
         velocity.update([pv[0].v, pv[1].v, pv[2].v])
         alt = position.magnitude() - EARTH_RADIUS
         altitude.append(alt)
-        dragforce.append(force)
+        dragforce.append(force*0.001)
         velocities.append(velocity.magnitude())
         lat, lon, a = Earth.get_lat_lon(position)
         trajectory.coords.addcoordinates([(math.degrees(lon),math.degrees(lat),round(a))])
@@ -112,7 +112,7 @@ def simulate_launch(angle):
             break
 
 
-    #plot_telemetry(time, velocities, altitude, dragforce)
+    plot_telemetry(time, velocities, altitude, dragforce)
     kml.save("trajectory.kml")
 
     return x, y, position, velocity, trajectory
@@ -156,12 +156,12 @@ def plot_telemetry(time, velocities, altitude, dragforce):
     ax2.plot(time, altitude, label="Altitude", color='g')
     ax3.plot(time, dragforce, label="Drag Force", color='r')
 
-    ax1.set_ylim([6000, 7000])
-    # ax2.set_ylim([0, 350000])
+    ax1.set_ylim([6000, 8000])
+    # ax3.set_ylim([0, 2000000])
 
     ax1.set_ylabel("Velocity (m/s)")
     ax2.set_ylabel("Altitude (m")
-    ax3.set_ylabel("Drag Force (N)")
+    ax3.set_ylabel("Drag Force (kN)")
 
     # ax1.legend(loc='upper left')
     # ax2.legend(loc='upper center')
@@ -185,16 +185,18 @@ def plot_telemetry(time, velocities, altitude, dragforce):
 if __name__=="__main__":
 
     # initial params
-    dt = 0.5 # [s]
-    duration = 2000.0 # [s]
+    dt = 0.1 # [s]
+    duration = 50.0 # [s]
     mass = 1000 # kg
-    rad = 0.1 # m
-    cd = drag_coeff(math.radians(15))
+    rad = 0.5 # m
+    nosecone_halfangle = 15
+    cd = drag_coeff(math.radians(nosecone_halfangle))
 
-    angle = 12
+    ballistic_coeff = mass / (cd * (math.pi * rad**2))
+    print(ballistic_coeff)
 
-
-    x, y, pos, vel, trajectory = simulate_launch(angle)
+    launch_angle = 15
+    x, y, pos, vel, trajectory = simulate_launch(launch_angle)
 
 
 
