@@ -54,14 +54,15 @@ def calc_mf(initial, dv, isp):
 
 if __name__ == "__main__":
 
-    mr = 16
-    drymass = 100
+    isp = 280
+    mr = 1.05614729
+    drymass = 115
     wetmass = drymass * mr
     propmass = wetmass - drymass
-    print(wetmass, propmass)
+    print("Wetmass: %.2f kg, PropMass: %.2f kg" % (wetmass, propmass))
 
-    dv = calc_dv(wetmass, drymass, 300)
-    print(dv)
+    dv = calc_dv(wetmass, drymass, isp)
+    print("DeltaV: %.2f m/s" % dv)
 
-    mf = calc_mf(wetmass, dv, 300)
-    print(mf)
+    mf = calc_mf(wetmass, dv, isp)
+    print("Final Mass: %.2f kg" % mf)
